@@ -1,11 +1,11 @@
 {
   "domain": "daily_fingerpori",
   "name": "Daily Fingerpori",
-  "version": "2.0.0",
-  "documentation": "https://github.com/yourgithubusername/fingerpori",
+  "version": "0.0.1",
+  "documentation": "https://github.com/Aasikki/daily-fingerpori",
   "requirements": [],
   "dependencies": [],
-  "codeowners": ["@yourgithub"],
+  "codeowners": ["@Aasikki"],
   "config_flow": true,
-  "repository": "https://github.com/yourgithubusername/fingerpori"
+  "repository": "https://github.com/Aasikki/daily-fingerpori"
 }
