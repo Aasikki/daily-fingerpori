@@ -1,0 +1,11 @@
+{
+  "domain": "fingerpori",
+  "name": "Daily Fingerpori",
+  "version": "2.0.0",
+  "documentation": "https://github.com/yourgithubusername/fingerpori",
+  "requirements": [],
+  "dependencies": [],
+  "codeowners": ["@yourgithub"],
+  "config_flow": true,
+  "repository": "https://github.com/yourgithubusername/fingerpori"
+}
