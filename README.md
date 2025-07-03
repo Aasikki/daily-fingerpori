@@ -4,3 +4,5 @@
 Downloads the daily fingerpori comic from http://fingerpori.org/ and displays it as an image entity in Home Assistant.
 
 Best when used with together my comic card https://github.com/Aasikki/comic-card but of course you can use any card that can display images from image entities, like the build in picture card.
+
+![entity](https://github.com/user-attachments/assets/a351901a-9b52-455c-a141-166051364a9b)
