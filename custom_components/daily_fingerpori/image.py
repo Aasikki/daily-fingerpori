@@ -1,5 +1,7 @@
 import logging
 import os
+import asyncio
+import socket
 from datetime import timedelta
 import aiohttp
 import xml.etree.ElementTree as ET
@@ -33,14 +35,31 @@ async def async_setup_platform(
     os.makedirs(os.path.dirname(image_path), exist_ok=True)
 
     async def update_image():
+        """Download latest comic from RSS feed with retries and timeout.
+        If download fails, keep existing file (do not overwrite with empty data)."""
+        timeout = aiohttp.ClientTimeout(total=30)
+        max_retries = 3
         try:
             async with aiohttp.ClientSession() as session:
-                # Fetch RSS feed
-                async with session.get(FEED_URL) as resp:
-                    if resp.status != 200:
-                        _LOGGER.warning("Failed to fetch feed: HTTP %s", resp.status)
-                        return None
-                    text = await resp.text()
+                # Fetch RSS feed (with retries)
+                text = None
+                for attempt in range(1, max_retries + 1):
+                    try:
+                        async with session.get(FEED_URL, timeout=timeout) as resp:
+                            if resp.status != 200:
+                                _LOGGER.warning("Failed to fetch feed (attempt %s): HTTP %s", attempt, resp.status)
+                                raise aiohttp.ClientError(f"HTTP {resp.status}")
+                            text = await resp.text()
+                            break
+                    except (aiohttp.ClientError, asyncio.TimeoutError, socket.gaierror) as err:
+                        _LOGGER.debug("Feed fetch attempt %s failed: %s", attempt, err)
+                        if attempt < max_retries:
+                            await asyncio.sleep(2 ** (attempt - 1))
+                        else:
+                            _LOGGER.warning("Failed to fetch feed after %s attempts: %s", max_retries, err)
+                if not text:
+                    _LOGGER.debug("Keeping existing image file (no new feed content).")
+                    return None
 
                 # Parse feed and find first item
                 try:
@@ -72,16 +91,31 @@ async def async_setup_platform(
                     _LOGGER.warning("No image URL found in latest feed item")
                     return None
 
-                # Download the image
-                async with session.get(img_url) as resp:
-                    if resp.status == 200:
-                        data = await resp.read()
-                        # Write file on executor to avoid blocking the event loop
-                        await hass.async_add_executor_job(_write_bytes, image_path, data)
-                        _LOGGER.debug("Downloaded Fingerpori comic from feed: %s", img_url)
-                        return data
-                    else:
-                        _LOGGER.warning("Failed to download image: HTTP %s", resp.status)
+                # Download the image (with retries)
+                data = None
+                for attempt in range(1, max_retries + 1):
+                    try:
+                        async with session.get(img_url, timeout=timeout) as resp:
+                            if resp.status == 200:
+                                data = await resp.read()
+                                break
+                            else:
+                                _LOGGER.warning("Failed to download image (attempt %s): HTTP %s", attempt, resp.status)
+                                raise aiohttp.ClientError(f"HTTP {resp.status}")
+                    except (aiohttp.ClientError, asyncio.TimeoutError, socket.gaierror) as err:
+                        _LOGGER.debug("Image download attempt %s failed: %s", attempt, err)
+                        if attempt < max_retries:
+                            await asyncio.sleep(2 ** (attempt - 1))
+                        else:
+                            _LOGGER.warning("Failed to download image after %s attempts: %s", max_retries, err)
+
+                if data:
+                    # Write file on executor to avoid blocking the event loop
+                    await hass.async_add_executor_job(_write_bytes, image_path, data)
+                    _LOGGER.debug("Downloaded Fingerpori comic from feed: %s", img_url)
+                    return data
+                else:
+                    _LOGGER.debug("Keeping existing image file (download failed).")
         except Exception as e:
             _LOGGER.warning("Failed to download Fingerpori comic: %s", e)
         return None
@@ -102,14 +136,31 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
     os.makedirs(os.path.dirname(image_path), exist_ok=True)
 
     async def update_image():
+        """Download latest comic from RSS feed with retries and timeout.
+        If download fails, keep existing file (do not overwrite with empty data)."""
+        timeout = aiohttp.ClientTimeout(total=30)
+        max_retries = 3
         try:
             async with aiohttp.ClientSession() as session:
-                # Fetch RSS feed
-                async with session.get(FEED_URL) as resp:
-                    if resp.status != 200:
-                        _LOGGER.warning("Failed to fetch feed: HTTP %s", resp.status)
-                        return None
-                    text = await resp.text()
+                # Fetch RSS feed (with retries)
+                text = None
+                for attempt in range(1, max_retries + 1):
+                    try:
+                        async with session.get(FEED_URL, timeout=timeout) as resp:
+                            if resp.status != 200:
+                                _LOGGER.warning("Failed to fetch feed (attempt %s): HTTP %s", attempt, resp.status)
+                                raise aiohttp.ClientError(f"HTTP {resp.status}")
+                            text = await resp.text()
+                            break
+                    except (aiohttp.ClientError, asyncio.TimeoutError, socket.gaierror) as err:
+                        _LOGGER.debug("Feed fetch attempt %s failed: %s", attempt, err)
+                        if attempt < max_retries:
+                            await asyncio.sleep(2 ** (attempt - 1))
+                        else:
+                            _LOGGER.warning("Failed to fetch feed after %s attempts: %s", max_retries, err)
+                if not text:
+                    _LOGGER.debug("Keeping existing image file (no new feed content).")
+                    return None
 
                 # Parse feed and find first item
                 try:
@@ -141,16 +192,31 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
                     _LOGGER.warning("No image URL found in latest feed item")
                     return None
 
-                # Download the image
-                async with session.get(img_url) as resp:
-                    if resp.status == 200:
-                        data = await resp.read()
-                        # Write file on executor to avoid blocking the event loop
-                        await hass.async_add_executor_job(_write_bytes, image_path, data)
-                        _LOGGER.debug("Downloaded Fingerpori comic from feed: %s", img_url)
-                        return data
-                    else:
-                        _LOGGER.warning("Failed to download image: HTTP %s", resp.status)
+                # Download the image (with retries)
+                data = None
+                for attempt in range(1, max_retries + 1):
+                    try:
+                        async with session.get(img_url, timeout=timeout) as resp:
+                            if resp.status == 200:
+                                data = await resp.read()
+                                break
+                            else:
+                                _LOGGER.warning("Failed to download image (attempt %s): HTTP %s", attempt, resp.status)
+                                raise aiohttp.ClientError(f"HTTP {resp.status}")
+                    except (aiohttp.ClientError, asyncio.TimeoutError, socket.gaierror) as err:
+                        _LOGGER.debug("Image download attempt %s failed: %s", attempt, err)
+                        if attempt < max_retries:
+                            await asyncio.sleep(2 ** (attempt - 1))
+                        else:
+                            _LOGGER.warning("Failed to download image after %s attempts: %s", max_retries, err)
+
+                if data:
+                    # Write file on executor to avoid blocking the event loop
+                    await hass.async_add_executor_job(_write_bytes, image_path, data)
+                    _LOGGER.debug("Downloaded Fingerpori comic from feed: %s", img_url)
+                    return data
+                else:
+                    _LOGGER.debug("Keeping existing image file (download failed).")
         except Exception as e:
             _LOGGER.warning("Failed to download Fingerpori comic: %s", e)
         return None
