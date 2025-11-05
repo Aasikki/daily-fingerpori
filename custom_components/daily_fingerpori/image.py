@@ -14,7 +14,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from homeassistant.util import dt as dt_util
 
-from .const import FILENAME, FEED_URL, DEFAULT_NAME, CONF_REFRESH_INTERVAL
+from .const import FILENAME, FEED_URL, DEFAULT_NAME, CONF_REFRESH_INTERVAL, DOMAIN
 from .image_entity import FingerporiImage
 from . import get_refresh_interval
 
@@ -129,7 +129,9 @@ async def async_setup_platform(
     )
 
     await coordinator.async_refresh()
-    async_add_entities([FingerporiImage(hass, coordinator, image_path)])
+    # When created from platform (legacy) we can't tie to a config entry;
+    # use None for config_entry_id so unique_id is based on feed filename.
+    async_add_entities([FingerporiImage(hass, coordinator, image_path, None, DEFAULT_NAME)])
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback):
     image_path = hass.config.path(f"www/{FILENAME}")
@@ -230,4 +232,5 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
         update_interval=timedelta(hours=interval),
     )
     await coordinator.async_refresh()
-    async_add_entities([FingerporiImage(hass, coordinator, image_path)])
+    # Pass config entry id and entry title so entity gets a stable unique_id
+    async_add_entities([FingerporiImage(hass, coordinator, image_path, entry.entry_id, entry.title or DEFAULT_NAME)])
