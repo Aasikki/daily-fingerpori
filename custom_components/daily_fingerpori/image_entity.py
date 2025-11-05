@@ -1,29 +1,23 @@
 from homeassistant.components.image import ImageEntity
-from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from .const import DEFAULT_NAME
+from homeassistant.core import HomeAssistant
 
-class FingerporiImage(CoordinatorEntity, ImageEntity):
-    _attr_name = DEFAULT_NAME
-    _attr_should_poll = False
-    _attr_unique_id = "comic_fingerpori"
-
-    def __init__(self, hass, coordinator, path):
-        CoordinatorEntity.__init__(self, coordinator)
-        ImageEntity.__init__(self, hass)
+class FingerporiImage(ImageEntity):
+    def __init__(self, hass: HomeAssistant, coordinator, path: str):
+        self.hass = hass
+        self.coordinator = coordinator
         self._path = path
         self.entity_id = "image.comic_fingerpori"
 
-    @property
-    def image_content(self):
+    def _read_file(self) -> bytes:
+        with open(self._path, "rb") as f:
+            return f.read()
+
+    async def async_image(self) -> bytes | None:
+        """Return image bytes. Read file on executor to avoid blocking the event loop."""
         try:
-            with open(self._path, "rb") as f:
-                return f.read()
+            return await self.hass.async_add_executor_job(self._read_file)
         except FileNotFoundError:
             return None
-
-    async def async_update(self):
-        await self.coordinator.async_request_refresh()
-
-    async def async_image(self):
-        """Return bytes of image (async)."""
-        return self.image_content
+        except Exception:
+            _LOGGER.exception("Failed to read fingerpori image file")
+            return None
