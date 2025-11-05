@@ -1,9 +1,7 @@
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.const import CONF_NAME
-from .const import DOMAIN, DEFAULT_NAME
-
-CONF_REFRESH_INTERVAL = "Comic Update Interval (hours)"
+from .const import DOMAIN, DEFAULT_NAME, CONF_REFRESH_INTERVAL
 
 class FingerporiConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_user(self, user_input=None):

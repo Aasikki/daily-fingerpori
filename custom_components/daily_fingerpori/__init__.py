@@ -1,4 +1,4 @@
-from .const import DOMAIN
+from .const import DOMAIN, CONF_REFRESH_INTERVAL
 
 async def async_setup(hass, config):
     return True
@@ -9,4 +9,4 @@ async def async_setup_entry(hass, entry):
 
 def get_refresh_interval(entry):
     # Default to 1 hour if not set
-    return entry.options.get("refresh_interval", 1)
+    return entry.options.get(CONF_REFRESH_INTERVAL, 1)
