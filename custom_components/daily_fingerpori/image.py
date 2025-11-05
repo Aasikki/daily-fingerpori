@@ -18,6 +18,11 @@ from . import get_refresh_interval
 
 _LOGGER = logging.getLogger(__name__)
 
+# Helper to perform blocking file write on executor
+def _write_bytes(path: str, data: bytes) -> None:
+    with open(path, "wb") as f:
+        f.write(data)
+
 async def async_setup_platform(
     hass: HomeAssistant,
     config: ConfigType,
@@ -71,8 +76,8 @@ async def async_setup_platform(
                 async with session.get(img_url) as resp:
                     if resp.status == 200:
                         data = await resp.read()
-                        with open(image_path, "wb") as f:
-                            f.write(data)
+                        # Write file on executor to avoid blocking the event loop
+                        await hass.async_add_executor_job(_write_bytes, image_path, data)
                         _LOGGER.debug("Downloaded Fingerpori comic from feed: %s", img_url)
                         return data
                     else:
@@ -140,8 +145,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
                 async with session.get(img_url) as resp:
                     if resp.status == 200:
                         data = await resp.read()
-                        with open(image_path, "wb") as f:
-                            f.write(data)
+                        # Write file on executor to avoid blocking the event loop
+                        await hass.async_add_executor_job(_write_bytes, image_path, data)
                         _LOGGER.debug("Downloaded Fingerpori comic from feed: %s", img_url)
                         return data
                     else:
