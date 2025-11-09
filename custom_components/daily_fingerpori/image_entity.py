@@ -1,13 +1,17 @@
 import logging
 import uuid
+import os
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.components.image import ImageEntity
 from homeassistant.core import HomeAssistant
 from .const import DOMAIN, DEFAULT_NAME
 
 _LOGGER = logging.getLogger(__name__)
 
-class FingerporiImage(ImageEntity):
+class FingerporiImage(CoordinatorEntity, ImageEntity):
     def __init__(self, hass: HomeAssistant, coordinator, path: str, config_entry_id: str | None = None, name: str | None = None):
+        # Initialize CoordinatorEntity so the entity receives coordinator updates
+        super().__init__(coordinator)
         self.hass = hass
         self.coordinator = coordinator
         self._path = path
@@ -28,20 +32,21 @@ class FingerporiImage(ImageEntity):
 
         self._name = name or DEFAULT_NAME
 
-    @property
-    def access_tokens(self) -> list[str]:
-        """Return access tokens used by the image helper."""
-        return self._access_tokens
+    async def async_added_to_hass(self) -> None:
+        """Register a listener to rotate the access token when coordinator updates."""
+        # coordinator.async_add_listener returns an unsubscribe callable
+        self._remove_coordinator_listener = self.coordinator.async_add_listener(self._on_coordinator_update)
 
-    @property
-    def unique_id(self) -> str:
-        """Return unique id for the entity (used by the entity registry)."""
-        return self._unique_id
+    async def async_will_remove_from_hass(self) -> None:
+        if hasattr(self, "_remove_coordinator_listener") and callable(self._remove_coordinator_listener):
+            self._remove_coordinator_listener()
 
-    @property
-    def name(self) -> str:
-        """Return the entity name shown in the UI."""
-        return self._name
+    def _on_coordinator_update(self) -> None:
+        """Rotate access token and write state so the frontend reloads the image."""
+        self._access_token = uuid.uuid4().hex
+        self._access_tokens = [self._access_token]
+        # Trigger HA state update so frontend will use the new token/url
+        self.async_write_ha_state()
 
     def _read_file(self) -> bytes:
         with open(self._path, "rb") as f:
@@ -56,3 +61,18 @@ class FingerporiImage(ImageEntity):
         except Exception:
             _LOGGER.exception("Failed to read fingerpori image file")
             return None
+
+    @property
+    def access_tokens(self) -> list[str]:
+        """Return access tokens used by the image helper."""
+        return self._access_tokens
+
+    @property
+    def unique_id(self) -> str:
+        """Return unique id for the entity (used by the entity registry)."""
+        return self._unique_id
+
+    @property
+    def name(self) -> str:
+        """Return the entity name shown in the UI."""
+        return self._name
