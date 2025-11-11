@@ -16,4 +16,6 @@ Gets the daily fingerpori comic from [darkball's RSS-feed](https://darkball.net/
 Best when used with together my comic card https://github.com/Aasikki/comic-card but of course you can use any card that can display images from image entities, like the build in picture card.
 
 <br>
+<br>
+
 <img width="611" height="376" alt="kuva" src="https://github.com/user-attachments/assets/0fce2824-778c-4987-bf5d-79ac0dc0d7a2" />
