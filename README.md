@@ -13,7 +13,7 @@ Toimii parhaiten tekemäni sarjakuva-kortin kanssa https://github.com/Aasikki/co
 ### ENG
 Gets the daily fingerpori comic from [darkball's RSS-feed](https://darkball.net/sarjakuvien-rss-syotteet/) and displays it as an image entity in Home Assistant.
 
-Best when used with together my comic card https://github.com/Aasikki/comic-card but of course you can use any card that can display images from image entities, like the build in picture card.
+Best when used with together my comic card https://github.com/Aasikki/comic-card but of course you can use any card that can display images from image entities, like the built-in picture card.
 
 <br>
 <br>
