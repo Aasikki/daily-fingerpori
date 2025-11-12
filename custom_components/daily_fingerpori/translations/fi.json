@@ -7,7 +7,13 @@
         "data": {
           "refresh_interval": "Sarjakuvan päivitysväli (tunteina)"
         }
-      },
+      }
+    }
+  }
+
+  ,
+  "options": {
+    "step": {
       "init": {
         "title": "Daily Fingerpori",
         "data": {

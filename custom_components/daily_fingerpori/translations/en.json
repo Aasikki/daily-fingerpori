@@ -7,7 +7,12 @@
         "data": {
           "refresh_interval": "Comic Update Interval (hours)"
         }
-      },
+      }
+    }
+  }
+  ,
+  "options": {
+    "step": {
       "init": {
         "title": "Daily Fingerpori",
         "data": {
