@@ -73,6 +73,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
                 item = items[0]
 
+                # Extract publication date from RSS item
+                pub_date_str = None
+                pub_date_elem = item.find("pubDate")
+                if pub_date_elem is not None and pub_date_elem.text:
+                    pub_date_str = pub_date_elem.text
+
                 # Try enclosure tag first
                 enclosure = item.find("enclosure")
                 img_url = None
@@ -111,7 +117,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                     # Write file on executor to avoid blocking the event loop
                     await hass.async_add_executor_job(_write_bytes, image_path, data)
                     _LOGGER.debug("Downloaded Fingerpori comic from feed: %s", img_url)
-                    return data
+                    # Return dict with image data and publication date
+                    return {
+                        "image_data": data,
+                        "pub_date": pub_date_str,
+                    }
                 else:
                     _LOGGER.debug("Keeping existing image file (download failed).")
         except Exception as e:
