@@ -103,13 +103,15 @@ class FingerporiImage(CoordinatorEntity, ImageEntity):
         return attrs
 
     @property
-    def state(self) -> datetime | None:
+    def state(self) -> str | None:
         """Return the entity state.
 
-        Return the publication date as a datetime object.
-        Home Assistant will format it according to the user's locale and date format preferences.
+        Return the publication date in ISO format for proper localization.
+        Format: "2025-11-12"
         """
-        return self._pub_date
+        if not self._pub_date:
+            return None
+        return self._pub_date.date().isoformat()
 
     def _read_file(self) -> bytes:
         with open(self._path, "rb") as f:
@@ -154,5 +156,5 @@ class FingerporiImage(CoordinatorEntity, ImageEntity):
 
     @property
     def device_class(self):
-        """Return device class for proper date formatting according to user's locale."""
-        return "timestamp"
+        """Return device class 'date' for date-only formatting with localization."""
+        return "date"
