@@ -8,5 +8,5 @@ async def async_setup_entry(hass, entry):
     return True
 
 def get_refresh_interval(entry):
-    # Default to 1 hour if not set
-    return entry.options.get(CONF_REFRESH_INTERVAL, 1)
+    # Default to 3 hours if not set
+    return entry.options.get(CONF_REFRESH_INTERVAL, 3)

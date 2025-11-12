@@ -12,7 +12,8 @@ class FingerporiConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema({
-                vol.Optional(CONF_REFRESH_INTERVAL, default=1): int
+                # Default update interval now 3 hours
+                vol.Optional(CONF_REFRESH_INTERVAL, default=3): int
             })
         )
 
@@ -33,6 +34,6 @@ class FingerporiOptionsFlowHandler(config_entries.OptionsFlow):
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema({
-                vol.Optional(CONF_REFRESH_INTERVAL, default=options.get(CONF_REFRESH_INTERVAL, 1)): int
+                vol.Optional(CONF_REFRESH_INTERVAL, default=options.get(CONF_REFRESH_INTERVAL, 3)): int
             })
         )

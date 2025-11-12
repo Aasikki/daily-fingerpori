@@ -1,0 +1,19 @@
+{
+  "title": "Daily Fingerpori",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Daily Fingerpori",
+        "data": {
+          "refresh_interval": "Sarjakuvan päivitysväli (tunteina)"
+        }
+      },
+      "init": {
+        "title": "Daily Fingerpori",
+        "data": {
+          "refresh_interval": "Sarjakuvan päivitysväli (tunteina)"
+        }
+      }
+    }
+  }
+}
