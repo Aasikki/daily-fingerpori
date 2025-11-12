@@ -9,9 +9,7 @@
         }
       }
     }
-  }
-
-  ,
+  },
   "options": {
     "step": {
       "init": {
@@ -19,6 +17,13 @@
         "data": {
           "refresh_interval": "Sarjakuvan päivitysväli (tunteina)"
         }
+      }
+    }
+  },
+  "entity": {
+    "button": {
+      "update": {
+        "name": "Päivitä sarjakuva"
       }
     }
   }

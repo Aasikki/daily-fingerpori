@@ -232,5 +232,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
         update_interval=timedelta(hours=interval),
     )
     await coordinator.async_refresh()
+    
+    # Store coordinator in hass.data so button platform can access it
+    hass.data[DOMAIN][entry.entry_id]["coordinator"] = coordinator
+    
     # Pass config entry id and entry title so entity gets a stable unique_id
     async_add_entities([FingerporiImage(hass, coordinator, image_path, entry.entry_id, entry.title or DEFAULT_NAME)])
