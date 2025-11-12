@@ -74,19 +74,25 @@ class FingerporiImage(CoordinatorEntity, ImageEntity):
     def extra_state_attributes(self) -> dict:
         """Return additional state attributes for the entity.
 
-        We expose last_refreshed as an ISO 8601 UTC timestamp to match other image entities.
+        Return any extra attributes for the entity. We no longer expose last_refreshed
+        as an attribute because it will be shown as the entity state instead.
+        """
+        return {}
+
+    @property
+    def state(self) -> str | None:
+        """Return the entity state.
+
+        Use ISO 8601 UTC timestamp of last refresh as the entity state so it matches
+        integrations like the Roborock image entity.
         """
         if not self._last_refreshed:
-            return {}
+            return None
 
         try:
-            # Ensure UTC and ISO format with timezone
-            ts = dt_util.as_utc(self._last_refreshed).isoformat()
+            return dt_util.as_utc(self._last_refreshed).isoformat()
         except Exception:
-            # Fallback to best-effort string
-            ts = getattr(self._last_refreshed, "isoformat", lambda: str(self._last_refreshed))()
-
-        return {"last_refreshed": ts}
+            return getattr(self._last_refreshed, "isoformat", lambda: str(self._last_refreshed))()
 
     def _read_file(self) -> bytes:
         with open(self._path, "rb") as f:
