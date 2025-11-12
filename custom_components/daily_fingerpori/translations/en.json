@@ -1,0 +1,24 @@
+{
+  "title": "Daily Fingerpori",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Daily Fingerpori",
+        "data": {
+          "refresh_interval": "Comic Update Interval (hours)"
+        }
+      }
+    }
+  }
+  ,
+  "options": {
+    "step": {
+      "init": {
+        "title": "Daily Fingerpori",
+        "data": {
+          "refresh_interval": "Comic Update Interval (hours)"
+        }
+      }
+    }
+  }
+}
