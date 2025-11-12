@@ -33,8 +33,8 @@ class FingerporiImage(CoordinatorEntity, ImageEntity):
             self._unique_id = f"{DOMAIN}_{os.path.basename(self._path)}"
 
         self._name = name or DEFAULT_NAME
-    # Timestamp when the image was last refreshed (timezone-aware UTC datetime)
-    self._last_refreshed: datetime | None = None
+        # Timestamp when the image was last refreshed (timezone-aware UTC datetime)
+        self._last_refreshed: datetime | None = None
 
     async def async_added_to_hass(self) -> None:
         """Register a listener to rotate the access token when coordinator updates."""
