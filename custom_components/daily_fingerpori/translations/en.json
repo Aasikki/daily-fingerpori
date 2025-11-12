@@ -9,8 +9,7 @@
         }
       }
     }
-  }
-  ,
+  },
   "options": {
     "step": {
       "init": {
@@ -18,6 +17,13 @@
         "data": {
           "refresh_interval": "Comic Update Interval (hours)"
         }
+      }
+    }
+  },
+  "entity": {
+    "button": {
+      "update": {
+        "name": "Update comic"
       }
     }
   }

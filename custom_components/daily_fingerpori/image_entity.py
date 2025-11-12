@@ -17,6 +17,7 @@ class FingerporiImage(CoordinatorEntity, ImageEntity):
         self.hass = hass
         self.coordinator = coordinator
         self._path = path
+        self._config_entry_id = config_entry_id
         # do not set a fixed entity_id — let HA assign one based on name/unique_id
 
         # minimal access token support required by the image component
@@ -122,3 +123,15 @@ class FingerporiImage(CoordinatorEntity, ImageEntity):
     def name(self) -> str:
         """Return the entity name shown in the UI."""
         return self._name
+
+    @property
+    def device_info(self):
+        """Return device information to group entities together."""
+        if self._config_entry_id:
+            return {
+                "identifiers": {(DOMAIN, self._config_entry_id)},
+                "name": self._name,
+                "manufacturer": "Fingerpori",
+                "model": "Daily Comic",
+            }
+        return None
