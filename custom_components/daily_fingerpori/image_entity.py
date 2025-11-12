@@ -36,8 +36,8 @@ class FingerporiImage(CoordinatorEntity, ImageEntity):
         self._name = name or DEFAULT_NAME
         # Timestamp when the image was last refreshed (timezone-aware UTC datetime)
         self._last_refreshed: datetime | None = None
-        # Publication date of the comic (string from RSS feed)
-        self._pub_date: str | None = None
+        # Publication date of the comic (datetime object from RSS feed)
+        self._pub_date: datetime | None = None
 
     async def async_added_to_hass(self) -> None:
         """Register a listener to rotate the access token when coordinator updates."""
@@ -55,9 +55,15 @@ class FingerporiImage(CoordinatorEntity, ImageEntity):
                 if isinstance(coordinator_time, datetime):
                     break
             self._last_refreshed = coordinator_time or dt_util.utcnow()
-            # Extract publication date from coordinator data
+            # Extract and parse publication date from coordinator data
             if isinstance(self.coordinator.data, dict):
-                self._pub_date = self.coordinator.data.get("pub_date")
+                pub_date_str = self.coordinator.data.get("pub_date")
+                if pub_date_str:
+                    try:
+                        from email.utils import parsedate_to_datetime
+                        self._pub_date = parsedate_to_datetime(pub_date_str)
+                    except Exception as e:
+                        _LOGGER.debug("Failed to parse publication date '%s': %s", pub_date_str, e)
         else:
             self._last_refreshed = None
 
@@ -73,9 +79,15 @@ class FingerporiImage(CoordinatorEntity, ImageEntity):
         # (update_image returns dict when a new image was actually downloaded)
         if getattr(self.coordinator, "data", None) is not None:
             self._last_refreshed = dt_util.utcnow()
-            # Extract publication date from coordinator data
+            # Extract and parse publication date from coordinator data
             if isinstance(self.coordinator.data, dict):
-                self._pub_date = self.coordinator.data.get("pub_date")
+                pub_date_str = self.coordinator.data.get("pub_date")
+                if pub_date_str:
+                    try:
+                        from email.utils import parsedate_to_datetime
+                        self._pub_date = parsedate_to_datetime(pub_date_str)
+                    except Exception as e:
+                        _LOGGER.debug("Failed to parse publication date '%s': %s", pub_date_str, e)
         # Trigger HA state update so frontend will use the new token/url
         self.async_write_ha_state()
 
@@ -91,25 +103,13 @@ class FingerporiImage(CoordinatorEntity, ImageEntity):
         return attrs
 
     @property
-    def state(self) -> str | None:
+    def state(self) -> datetime | None:
         """Return the entity state.
 
-        Show the publication date of the comic as the state.
-        Format: "2025-11-12" (date only, no time)
+        Return the publication date as a datetime object.
+        Home Assistant will format it according to the user's locale and date format preferences.
         """
-        if not self._pub_date:
-            return None
-
-        try:
-            # Parse RSS pubDate format (e.g., "Tue, 12 Nov 2025 06:00:00 +0000")
-            # and return just the date part in ISO format
-            from email.utils import parsedate_to_datetime
-            pub_datetime = parsedate_to_datetime(self._pub_date)
-            return pub_datetime.date().isoformat()
-        except Exception as e:
-            _LOGGER.debug("Failed to parse publication date '%s': %s", self._pub_date, e)
-            # Fallback: return the raw string if parsing fails
-            return self._pub_date
+        return self._pub_date
 
     def _read_file(self) -> bytes:
         with open(self._path, "rb") as f:
@@ -151,3 +151,8 @@ class FingerporiImage(CoordinatorEntity, ImageEntity):
                 "model": "Daily Comic",
             }
         return None
+
+    @property
+    def device_class(self):
+        """Return device class for proper date formatting according to user's locale."""
+        return "timestamp"
