@@ -3,6 +3,7 @@
   "name": "Daily Fingerpori",
   "version": "v1.1.0",
   "documentation": "https://github.com/Aasikki/daily-fingerpori",
+  "issue_tracker": "https://github.com/Aasikki/daily-fingerpori/issues",
   "requirements": [],
   "dependencies": [],
   "codeowners": ["@Aasikki"],
