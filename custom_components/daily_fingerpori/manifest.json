@@ -1,7 +1,7 @@
 {
   "domain": "daily_fingerpori",
   "name": "Daily Fingerpori",
-  "version": "1.1.0",
+  "version": "v1.1.0",
   "documentation": "https://github.com/Aasikki/daily-fingerpori",
   "requirements": [],
   "dependencies": [],
