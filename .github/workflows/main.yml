@@ -16,7 +16,7 @@ jobs:
       - name: HACS validation
         uses: "hacs/action@main"
         with:
-          category: "CHANGE_ME!"
+          category: "integration"
   validate-hassfest:
     runs-on: "ubuntu-latest"
     steps:
