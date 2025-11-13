@@ -4,6 +4,7 @@
   "version": "v1.1.0",
   "documentation": "https://github.com/Aasikki/daily-fingerpori",
   "issue_tracker": "https://github.com/Aasikki/daily-fingerpori/issues",
+  "iot_class": "cloud_polling",
   "requirements": [],
   "dependencies": [],
   "codeowners": ["@Aasikki"],
