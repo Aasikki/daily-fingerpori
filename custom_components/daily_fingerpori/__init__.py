@@ -10,10 +10,13 @@ import re
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.helpers import config_validation as cv
 
 from .const import DOMAIN, CONF_REFRESH_INTERVAL, FILENAME, FEED_URL
 
 _LOGGER = logging.getLogger(__name__)
+
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 # Helper to perform blocking file write on executor
 def _write_bytes(path: str, data: bytes) -> None:
